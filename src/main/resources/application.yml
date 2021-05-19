@@ -1,0 +1,27 @@
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/playground?schema=currency_exchanges
+    username: postgres
+    password: postgres
+
+  application:
+    name: rest-currency-convert
+
+  flyway:
+    url: jdbc:postgresql://localhost:5432/playground
+    user: ${spring.r2dbc.username}
+    password: ${spring.r2dbc.password}
+    baseline-on-migrate: true
+
+
+server:
+  port: 8080
+  servlet:
+    context-path: /dev/api/rest-currency-convert
+
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          r2dbc: DEBUG

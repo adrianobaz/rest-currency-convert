@@ -1,0 +1,22 @@
+# Docker Compose file Reference (https://docs.docker.com/compose/compose-file/)
+version: '3.8'
+services:
+  # Database Service (Postgres)
+  db:
+    image: postgres:12
+    container_name: postgres-db
+    restart: always
+
+    ports:
+      - "5432:5432"
+
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: playground
+    # Service health check
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 1m
+      timeout: 10s
+      retries: 2
