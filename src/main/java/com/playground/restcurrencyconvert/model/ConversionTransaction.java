@@ -7,6 +7,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.OffsetDateTime;
 
 @NoArgsConstructor
@@ -49,7 +50,7 @@ public class ConversionTransaction {
 
 
     public BigDecimal calculateDestinyValue(BigDecimal originValue, BigDecimal conversionRate) {
-        return originValue.multiply(conversionRate);
+        return originValue.multiply(conversionRate).setScale(2, RoundingMode.HALF_EVEN);
     }
 
 }

@@ -13,11 +13,8 @@ spring:
     password: ${spring.r2dbc.password}
     baseline-on-migrate: true
 
-
 server:
   port: 8080
-  servlet:
-    context-path: /dev/api/rest-currency-convert
 
 logging:
   level:
@@ -25,3 +22,9 @@ logging:
       springframework:
         data:
           r2dbc: DEBUG
+
+springdoc:
+  version: 1.2
+  use-root-path: true
+  swagger-ui:
+    use-root-path: true

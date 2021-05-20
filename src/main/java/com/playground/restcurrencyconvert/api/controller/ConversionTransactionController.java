@@ -5,16 +5,19 @@ import com.playground.restcurrencyconvert.api.model.output.ConversionTransaction
 import com.playground.restcurrencyconvert.model.ConversionTransaction;
 import com.playground.restcurrencyconvert.service.IConversionTransactionService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.Collection;
 
 @RestController
 @RequestMapping("/v1/conversion-transactions")
 @RequiredArgsConstructor
+@Slf4j
 public class ConversionTransactionController {
 
     private final IConversionTransactionService conversionTransactionService;
@@ -29,12 +32,12 @@ public class ConversionTransactionController {
         return null;
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping(value = "/{userId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ConversionTransactionOutput> requestConversionTransactionsByUserId(@PathVariable Integer userId) {
         Flux<ConversionTransaction> conversionTransactionFlux =
                 conversionTransactionService.retrieveAllTransactionsByUserId(userId);
-        return conversionTransactionFlux.flatMap(conversionTransaction ->
-                Mono.just(this.toRepresentationModel(conversionTransaction)));
+        return conversionTransactionFlux.map(this::toRepresentationModel)
+                .delayElements(Duration.ofSeconds(1)).doOnNext(i -> log.info("{}", i));
     }
 
     private ConversionTransactionOutput toRepresentationModel(ConversionTransaction conversionTransaction) {

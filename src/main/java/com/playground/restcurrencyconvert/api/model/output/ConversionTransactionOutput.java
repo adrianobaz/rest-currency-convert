@@ -1,10 +1,7 @@
 package com.playground.restcurrencyconvert.api.model.output;
 
 import com.playground.restcurrencyconvert.model.ConversionTransaction;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -13,6 +10,7 @@ import java.time.OffsetDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class ConversionTransactionOutput {
 
     private Long id;

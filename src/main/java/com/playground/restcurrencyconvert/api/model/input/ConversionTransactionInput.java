@@ -10,6 +10,7 @@ import java.util.Collection;
 @Setter
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class ConversionTransactionInput {
 
     @NotNull(message = "User id cannot be empty.")
