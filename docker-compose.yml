@@ -15,8 +15,8 @@ services:
       POSTGRES_PASSWORD: root
       POSTGRES_DB: playground
     # Service health check
-    healthcheck:
-      test: pg_isready -U postgres
-      interval: 1m
-      timeout: 10s
-      retries: 2
+#    healthcheck:
+#      test: pg_isready -U postgres
+#      interval: 1m
+#      timeout: 10s
+#      retries: 2

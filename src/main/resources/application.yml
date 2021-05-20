@@ -1,8 +1,8 @@
 spring:
   r2dbc:
     url: r2dbc:postgresql://localhost:5432/playground?schema=currency_exchanges
-    username: postgres
-    password: postgres
+    username: root
+    password: root
 
   application:
     name: rest-currency-convert
@@ -24,7 +24,7 @@ logging:
           r2dbc: DEBUG
 
 springdoc:
-  version: 1.2
+  version: 1
   use-root-path: true
   swagger-ui:
     use-root-path: true

@@ -17,6 +17,10 @@
 		<java.version>11</java.version>
 		<testcontainers.version>1.15.3</testcontainers.version>
 		<blockhound.version>1.0.3.RELEASE</blockhound.version>
+		<r2dbc-postgresql.version>0.8.7.RELEASE</r2dbc-postgresql.version>
+		<flyway-core.version>7.1.1</flyway-core.version>
+		<reactor-tools.version>3.4.5</reactor-tools.version>
+		<springdoc-openapi-webflux-ui.version>1.5.8</springdoc-openapi-webflux-ui.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -35,19 +39,22 @@
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
+			<version>${flyway-core.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.r2dbc</groupId>
 			<artifactId>r2dbc-postgresql</artifactId>
+			<version>${r2dbc-postgresql.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.projectreactor</groupId>
 			<artifactId>reactor-tools</artifactId>
+			<version>${reactor-tools.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-webflux-ui</artifactId>
-			<version>1.5.2</version>
+			<version>${springdoc-openapi-webflux-ui.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>

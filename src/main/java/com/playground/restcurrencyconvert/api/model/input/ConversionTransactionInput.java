@@ -21,7 +21,7 @@ public class ConversionTransactionInput {
     private String originCurrency;
 
     @NotNull(message = "Origin value cannot be empty")
-    @Digits(integer = 20, fraction = 9)
+    @Digits(integer = 20, fraction = 2)
     private BigDecimal originValue;
 
     @NotEmpty(message = "Cannot be empty!")

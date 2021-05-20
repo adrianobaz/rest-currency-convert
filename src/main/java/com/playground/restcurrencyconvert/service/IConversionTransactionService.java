@@ -10,6 +10,6 @@ public interface IConversionTransactionService {
 
     void applyRateAndSave(Integer userId, String originCurrency, BigDecimal originValue, Collection<String> destinyCurrencys);
 
-    Flux<ConversionTransaction> retrieveAllTransactionsByUserId(Integer userId);
+    Flux<ConversionTransaction> retrieveAllConvertTransactionsByUserId(Integer userId);
 
 }

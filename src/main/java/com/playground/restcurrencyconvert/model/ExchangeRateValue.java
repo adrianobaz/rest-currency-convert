@@ -39,7 +39,7 @@ public class ExchangeRateValue {
 
         stringBuilder.append(", base: '".concat(base)).append('\'');
         stringBuilder.append(", date: ".concat(date.toString()));
-        stringBuilder.append(", rates: " + rates).append('}');
+        stringBuilder.append(", rates: ").append(rates).append('}');
 
         return stringBuilder.toString();
     }

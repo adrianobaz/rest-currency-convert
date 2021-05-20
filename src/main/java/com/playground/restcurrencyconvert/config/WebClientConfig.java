@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebClientConfig {
 
     private static final String BASE_URL_EXCHANGE_RATE_API
-            = "http://api.exchangeratesapi.io/v1/latest?access_key=b925c23ac599142ce5fdc632d57cba8c";
+            = "http://api.exchangeratesapi.io/v1/";
 
     private static final String BASE_URL_CURRCONV_API
             = "http://free.currconv.com/api/v7/convert?apiKey=f6c3dba59f19e0bbe471";

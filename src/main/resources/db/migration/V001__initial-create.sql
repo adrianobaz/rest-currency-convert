@@ -10,5 +10,5 @@ create table if not exists currency_exchanges.conversion_transaction
     origin_value             numeric         not null,
     destiny_currency         varchar(5)      not null,
     conversion_rate          numeric         not null,
-    creation_date_time       timestamptz     default now() not null
+    creation_date_time       timestamptz     default  DATE_TRUNC('second',now())  not null
 );

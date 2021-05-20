@@ -24,64 +24,56 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ConversionTransactionServiceImpl implements IConversionTransactionService {
 
+    private static final String ACESS_KEY_EXCHANGE_RATE_API = "b925c23ac599142ce5fdc632d57cba8c";
     private final IConversionTransactionRepository conversionTransactionRepository;
-
     private final WebClient webClientExchangeRatesApi;
-
     private final WebClient webClientCurrConvApi;
 
     @Override
     public void applyRateAndSave(Integer userId, String originCurrency, BigDecimal originValue, Collection<String> destinyCurrencys) {
-        String originCurrencyUpper = originCurrency.toUpperCase();
-        String destinyCurrencysCommaSeparated = destinyCurrencys.stream()
-                .map(String::toUpperCase)
-                .collect(Collectors.joining(Character.toString(StringUtil.COMMA)));
-
-        log.info("API request to retrieve exchange rates ...");
+        log.info("START of request to API for retrieve exchange rates...");
 
         // IMPLEMENT HANDLING ERRORS
         Mono<ExchangeRateValue> exchangeRateValueMono = this.webClientExchangeRatesApi
                 .get()
-                .uri(getUriExchangeRateApiBaseSymbolsCurrency(originCurrencyUpper, destinyCurrencysCommaSeparated))
+                .uri(getUriExchangeRateApiBaseSymbolsCurrency(originCurrency, destinyCurrencys))
                 .retrieve()
                 .bodyToMono(ExchangeRateValue.class);
 
-        log.info("Processing API request to retrieve exchange rates...");
+        log.info("PROCESSESSING API request to retrieve exchange rates...");
 
         exchangeRateValueMono.subscribe(exchangeRateValue -> {
 
-            log.info("Requested information was returned successfully!...");
+            log.info("Requested information was RETURNED successfully!...");
 
             log.info("Exchange Rate values: {}", exchangeRateValue);
 
-//            exchangeRateValue.getRates().forEach((destinyCurrency, conversionRate) -> {
-//                saveTransaction(userId, originValue, originCurrencyUpper, destinyCurrency, conversionRate);
-//                log.info("Records persisted successfully!");
-//            });
+            exchangeRateValue.getRates().forEach((destinyCurrency, conversionRate) -> {
+                saveConverTransaction(userId, originValue, originCurrency, destinyCurrency, conversionRate);
+            });
+            log.info("Records persisted successfully!");
         });
 
     }
 
     @Override
-    public Flux<ConversionTransaction> retrieveAllTransactionsByUserId(Integer userId) {
+    public Flux<ConversionTransaction> retrieveAllConvertTransactionsByUserId(Integer userId) {
         return conversionTransactionRepository.findAllByUserId(userId);
     }
 
 
-    public void saveTransaction(Integer userId, BigDecimal originValue, String originCurrencyUpper,
-                                     String destinyCurrency, BigDecimal conversionRate) {
-        ConversionTransaction conversionTransaction = new ConversionTransaction();
-        conversionTransaction.setUserId(userId);
-        conversionTransaction.setOriginCurrency(originCurrencyUpper);
-        conversionTransaction.setOriginValue(originValue);
-        conversionTransaction.setDestinyCurrency(destinyCurrency);
-        conversionTransaction.setConversionRate(conversionRate);
-        conversionTransactionRepository.save(conversionTransaction);
+    public void saveConverTransaction(Integer userId, BigDecimal originValue, String originCurrencyUpper,
+                                String destinyCurrency, BigDecimal conversionRate) {
+        conversionTransactionRepository.save(new ConversionTransaction(userId, originCurrencyUpper,
+                originValue, destinyCurrency, conversionRate)).subscribe();
     }
 
-    private Function<UriBuilder, URI> getUriExchangeRateApiBaseSymbolsCurrency(String originCurrencyUpper, String destinyCurrencysCommaSeparated) {
+    private Function<UriBuilder, URI> getUriExchangeRateApiBaseSymbolsCurrency(String originCurrencyUpper, Collection<String> destinyCurrencys) {
+        String destinyCurrencysCommaSeparated = destinyCurrencys.stream()
+                .collect(Collectors.joining(Character.toString(StringUtil.COMMA)));
         return uriBuilder ->
-                uriBuilder.path(StringUtil.EMPTY_STRING)
+                uriBuilder.path("latest")
+                        .queryParam("access_key", ACESS_KEY_EXCHANGE_RATE_API)
                         .queryParam("base", originCurrencyUpper)
                         .queryParam("symbols", destinyCurrencysCommaSeparated)
                         .build();

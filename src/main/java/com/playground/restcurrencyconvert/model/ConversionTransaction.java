@@ -53,4 +53,12 @@ public class ConversionTransaction {
         return originValue.multiply(conversionRate).setScale(2, RoundingMode.HALF_EVEN);
     }
 
+    public ConversionTransaction(Integer userId, String originCurrency, BigDecimal originValue,
+                                 String destinyCurrency, BigDecimal conversionRate) {
+        this.userId = userId;
+        this.originCurrency = originCurrency;
+        this.originValue = originValue;
+        this.destinyCurrency = destinyCurrency;
+        this.conversionRate = conversionRate;
+    }
 }
