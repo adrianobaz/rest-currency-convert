@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.OffsetDateTime;
 
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table("conversion_transaction")
