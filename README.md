@@ -1,3 +1,5 @@
+# Apresentação sobre o projeto: propósito, features, motivação das principais escolhas de tecnologias, e separação das camadas.
+
 # Currency Convert REST API
 
 Description
@@ -5,6 +7,56 @@ Description
 XXX
 XXX
 XXX
+
+## How it works:
+### **1. Docker. First, you need to install docker**
+* Download Docker [Here](https://docs.docker.com/docker-for-windows/install/). Hint: Enable Hyper-V feature on windows and restart;
+* Then open powershell and check:
+```bash
+docker info
+```
+or check docker version
+```bash
+docker -v
+```
+or docker compose version
+```bash
+docker-compose -v
+```
+### **2. Spring boot app**
+* Clone the repository:
+```bash
+git clone https://github.com/adrianobaz/rest-currency-convert.git
+```
+* Build the maven project:
+```bash
+mvn clean install
+```
+* Running the containers:
+
+This command will build the docker containers and start them.
+```bash
+docker-compose up
+```
+or
+
+This is a similar command as above, except it will run all the processes in the background.
+```bash
+docker-compose -f docker-compose.yml up
+```
+
+Appendix A.
+
+All commands should be run from project root (where docker-compose.yml locates)
+
+* If you have to want to see running containers. Checklist docker containers
+```bash
+docker container list -a
+```
+or
+```bash
+docker-compose ps
+```
 
 ## Install
 
@@ -157,4 +209,3 @@ The REST API to the example app is described below.
     Content-Length: 40
 
     {"id":1,"name":"Foo","status":"changed"}
-# res-currency-convert-webflux

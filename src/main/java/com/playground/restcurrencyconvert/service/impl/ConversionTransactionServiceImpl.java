@@ -7,6 +7,7 @@ import com.playground.restcurrencyconvert.service.IConversionTransactionService;
 import io.netty.util.internal.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
@@ -15,7 +16,10 @@ import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.net.URI;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -30,7 +34,8 @@ public class ConversionTransactionServiceImpl implements IConversionTransactionS
     private final WebClient webClientCurrConvApi;
 
     @Override
-    public void applyRateAndSave(Integer userId, String originCurrency, BigDecimal originValue, Collection<String> destinyCurrencys) {
+    public Flux<ConversionTransaction> applyRateAndSave(Integer userId, String originCurrency, BigDecimal originValue,
+                                                        Collection<String> destinyCurrencys) {
         log.info("START of request to API for retrieve exchange rates...");
 
         // IMPLEMENT HANDLING ERRORS
@@ -38,22 +43,29 @@ public class ConversionTransactionServiceImpl implements IConversionTransactionS
                 .get()
                 .uri(getUriExchangeRateApiBaseSymbolsCurrency(originCurrency, destinyCurrencys))
                 .retrieve()
+                .onStatus(HttpStatus::is4xxClientError,
+                        error -> Mono.error(new RuntimeException("API not found")))
                 .bodyToMono(ExchangeRateValue.class);
 
-        log.info("PROCESSESSING API request to retrieve exchange rates...");
+        return Flux.concat(
+                exchangeRateValueMono.map(exchangeRateValue -> {
 
-        exchangeRateValueMono.subscribe(exchangeRateValue -> {
+                    log.info("Requested information was RETURNED successfully!...");
 
-            log.info("Requested information was RETURNED successfully!...");
+                    log.info("Exchange Rate values: {}", exchangeRateValue);
 
-            log.info("Exchange Rate values: {}", exchangeRateValue);
-
-            exchangeRateValue.getRates().forEach((destinyCurrency, conversionRate) -> {
-                saveConverTransaction(userId, originValue, originCurrency, destinyCurrency, conversionRate);
-            });
-            log.info("Records persisted successfully!");
-        });
-
+                    Collection<Mono<ConversionTransaction>> conversionTransactions = new ArrayList<>();
+                    for (Map.Entry<String, BigDecimal> pair : exchangeRateValue.getRates().entrySet()) {
+                        Mono<ConversionTransaction> conversionTransactionMono = this.saveConvertTransaction(
+                                new ConversionTransaction(userId, originCurrency, originValue,
+                                        pair.getKey(), pair.getValue(), OffsetDateTime.now())
+                        ).log();
+                        conversionTransactions.add(conversionTransactionMono);
+                    }
+                    log.info("Record(s) persisted successfully!!!");
+                    var monoList = Flux.fromIterable(conversionTransactions).flatMap(s -> s).collectList();
+                    return monoList.flatMapMany(Flux::fromIterable);
+                }));
     }
 
     @Override
@@ -61,14 +73,13 @@ public class ConversionTransactionServiceImpl implements IConversionTransactionS
         return conversionTransactionRepository.findAllByUserId(userId);
     }
 
-
-    public void saveConverTransaction(Integer userId, BigDecimal originValue, String originCurrencyUpper,
-                                String destinyCurrency, BigDecimal conversionRate) {
-        conversionTransactionRepository.save(new ConversionTransaction(userId, originCurrencyUpper,
-                originValue, destinyCurrency, conversionRate)).subscribe();
+    @Override
+    public Mono<ConversionTransaction> saveConvertTransaction(ConversionTransaction conversionTransaction) {
+        return conversionTransactionRepository.save(conversionTransaction);
     }
 
-    private Function<UriBuilder, URI> getUriExchangeRateApiBaseSymbolsCurrency(String originCurrencyUpper, Collection<String> destinyCurrencys) {
+    private Function<UriBuilder, URI> getUriExchangeRateApiBaseSymbolsCurrency(String originCurrencyUpper,
+                                                                               Collection<String> destinyCurrencys) {
         String destinyCurrencysCommaSeparated = destinyCurrencys.stream()
                 .collect(Collectors.joining(Character.toString(StringUtil.COMMA)));
         return uriBuilder ->

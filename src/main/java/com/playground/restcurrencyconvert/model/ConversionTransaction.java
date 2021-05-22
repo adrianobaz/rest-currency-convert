@@ -54,11 +54,12 @@ public class ConversionTransaction {
     }
 
     public ConversionTransaction(Integer userId, String originCurrency, BigDecimal originValue,
-                                 String destinyCurrency, BigDecimal conversionRate) {
+                                 String destinyCurrency, BigDecimal conversionRate, OffsetDateTime creationDateTime) {
         this.userId = userId;
         this.originCurrency = originCurrency;
         this.originValue = originValue;
         this.destinyCurrency = destinyCurrency;
         this.conversionRate = conversionRate;
+        this.creationDateTime = creationDateTime;
     }
 }

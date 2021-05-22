@@ -43,8 +43,8 @@ public class ConversionTransactionController {
                 .stream()
                 .map(String::toUpperCase)
                 .collect(Collectors.toList());
-        conversionTransactionService.applyRateAndSave(userId, originCurrency, originValue, destinyCurrencys);
-        return null;
+        return conversionTransactionMapper.toRepresentationModel(
+                conversionTransactionService.applyRateAndSave(userId, originCurrency, originValue, destinyCurrencys));
     }
 
     @Operation(description = "Conversion transactions are sent to the client as Server Sent Events",
