@@ -1,6 +1,14 @@
-# Docker Compose file Reference (https://docs.docker.com/compose/compose-file/)
 version: '3.8'
 services:
+  # App
+  app:
+    image: 'rest-currency-convert:latest'
+    build:
+      context: .
+    container_name: app
+    depends_on:
+      - db
+
   # Database Service (Postgres)
   db:
     image: postgres:12
@@ -14,9 +22,3 @@ services:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
       POSTGRES_DB: playground
-    # Service health check
-#    healthcheck:
-#      test: pg_isready -U postgres
-#      interval: 1m
-#      timeout: 10s
-#      retries: 2

@@ -13,6 +13,7 @@ import java.time.OffsetDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 @Table("conversion_transaction")
 public class ConversionTransaction {
 

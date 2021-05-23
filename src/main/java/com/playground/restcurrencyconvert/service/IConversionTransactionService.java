@@ -9,7 +9,8 @@ import java.util.Collection;
 
 public interface IConversionTransactionService {
 
-    Flux<ConversionTransaction> applyRateAndSave(Integer userId, String originCurrency, BigDecimal originValue, Collection<String> destinyCurrencys);
+    Flux<ConversionTransaction> applyRateAndSave(Integer userId, String originCurrency,
+                                                 BigDecimal originValue, Collection<String> destinyCurrencys);
 
     Flux<ConversionTransaction> retrieveAllConvertTransactionsByUserId(Integer userId);
 

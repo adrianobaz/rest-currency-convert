@@ -8,9 +8,9 @@ import java.time.OffsetDateTime;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @ToString
+@EqualsAndHashCode
+@NoArgsConstructor
 public class ConversionTransactionOutput {
 
     private Long id;

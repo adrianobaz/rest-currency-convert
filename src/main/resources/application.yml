@@ -18,13 +18,12 @@ server:
 
 logging:
   level:
-    org:
-      springframework:
-        data:
-          r2dbc: DEBUG
+    org.springframework.data.r2dbc: debug
+
+reactor
 
 springdoc:
-  version: 1
+  version: 1.0
   use-root-path: true
   swagger-ui:
     use-root-path: true

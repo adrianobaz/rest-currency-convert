@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -31,21 +32,22 @@ public class ConversionTransactionServiceImpl implements IConversionTransactionS
     private static final String ACESS_KEY_EXCHANGE_RATE_API = "b925c23ac599142ce5fdc632d57cba8c";
     private final IConversionTransactionRepository conversionTransactionRepository;
     private final WebClient webClientExchangeRatesApi;
-    private final WebClient webClientCurrConvApi;
 
     @Override
     public Flux<ConversionTransaction> applyRateAndSave(Integer userId, String originCurrency, BigDecimal originValue,
                                                         Collection<String> destinyCurrencys) {
-        log.info("START of request to API for retrieve exchange rates...");
+        log.info("Start request to API for retrieve exchange rates...");
 
-        // IMPLEMENT HANDLING ERRORS
         Mono<ExchangeRateValue> exchangeRateValueMono = this.webClientExchangeRatesApi
                 .get()
                 .uri(getUriExchangeRateApiBaseSymbolsCurrency(originCurrency, destinyCurrencys))
                 .retrieve()
-                .onStatus(HttpStatus::is4xxClientError,
-                        error -> Mono.error(new RuntimeException("API not found")))
-                .bodyToMono(ExchangeRateValue.class);
+                .onStatus(HttpStatus::is4xxClientError, error ->
+                        get4xxError(HttpStatus.NOT_FOUND, "Exchange rates service not found!"))
+                .onStatus(HttpStatus::is5xxServerError, error ->
+                        get5xxError(HttpStatus.NOT_FOUND, "Exchange rates service not found!"))
+                .bodyToMono(ExchangeRateValue.class)
+                .log();
 
         return Flux.concat(
                 exchangeRateValueMono.map(exchangeRateValue -> {
@@ -62,7 +64,6 @@ public class ConversionTransactionServiceImpl implements IConversionTransactionS
                         ).log();
                         conversionTransactions.add(conversionTransactionMono);
                     }
-                    log.info("Record(s) persisted successfully!!!");
                     var monoList = Flux.fromIterable(conversionTransactions).flatMap(s -> s).collectList();
                     return monoList.flatMapMany(Flux::fromIterable);
                 }));
@@ -70,7 +71,8 @@ public class ConversionTransactionServiceImpl implements IConversionTransactionS
 
     @Override
     public Flux<ConversionTransaction> retrieveAllConvertTransactionsByUserId(Integer userId) {
-        return conversionTransactionRepository.findAllByUserId(userId);
+        return conversionTransactionRepository.findAllByUserId(userId)
+                .switchIfEmpty(fluxResponseStatusNotFoundException());
     }
 
     @Override
@@ -88,5 +90,17 @@ public class ConversionTransactionServiceImpl implements IConversionTransactionS
                         .queryParam("base", originCurrencyUpper)
                         .queryParam("symbols", destinyCurrencysCommaSeparated)
                         .build();
+    }
+
+    private Mono<Throwable> get4xxError(HttpStatus notFound, String s) {
+        return Mono.error(new ResponseStatusException(notFound, s));
+    }
+
+    private Mono<Throwable> get5xxError(HttpStatus serverError, String s) {
+        return Mono.error(new ResponseStatusException(serverError, s));
+    }
+
+    private <T> Flux<T> fluxResponseStatusNotFoundException() {
+        return Flux.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 }
