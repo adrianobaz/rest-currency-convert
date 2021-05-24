@@ -139,6 +139,33 @@ this [LINK](http://localhost:8088/swagger-ui.html).
         "description": "Initial currency origin cannot be empty"
     }
 
+## Create a new conversion transactions but Exchange Rates Service could not find the requested resource
+
+### Request
+
+`POST /v1/conversion-transactions`
+
+    curl -i -H 'Accept: application/json' -d '{"userId":1,"originCurrency":"BRL","originValue":1998.89,"destinyCurrencys":["BRL","AFN","ALL","AMD"]}' http://localhost:8088/v1/conversion-transactions
+
+### Response
+
+    HTTP/1.1 404 Not Found
+    Date: Mon, 24 May 2021 02:57:13 GMT
+    Status: 404 Not Found
+    Connection: close
+    Content-Type: application/json
+    Content-Length: 36
+    
+    {
+        "timestamp": "2021-05-24T03:31:19.468+00:00",
+        "path": "/v1/conversion-transactions",
+        "status": 404,
+        "error": "Not Found",
+        "message": "404 NOT_FOUND \"Exchange Rates Service could not find the requested resource! Please, check https://exchangeratesapi.io/ \"",
+        "description": "404 NOT_FOUND \"Exchange Rates Service could not find the requested resource! Please, check https://exchangeratesapi.io/ \""
+    }
+        
+        
 ## Get all conversion transactions by user id
 
 ### Request

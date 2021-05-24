@@ -36,25 +36,22 @@ public class ConversionTransactionServiceImpl implements IConversionTransactionS
     @Override
     public Flux<ConversionTransaction> applyRateAndSave(Integer userId, String originCurrency, BigDecimal originValue,
                                                         Collection<String> destinyCurrencys) {
-        log.info("Start request to API for retrieve exchange rates...");
+        log.info("START REQUEST TO API FOR RETRIEVE EXCHANGE RATES...");
 
         Mono<ExchangeRateValue> exchangeRateValueMono = this.webClientExchangeRatesApi
                 .get()
                 .uri(getUriExchangeRateApiBaseSymbolsCurrency(originCurrency, destinyCurrencys))
                 .retrieve()
-                .onStatus(HttpStatus::is4xxClientError, error ->
-                        get4xxError(HttpStatus.NOT_FOUND, "Exchange rates service not found!"))
-                .onStatus(HttpStatus::is5xxServerError, error ->
-                        get5xxError(HttpStatus.NOT_FOUND, "Exchange rates service not found!"))
+                .onStatus(HttpStatus::is4xxClientError, error -> get4xxError())
                 .bodyToMono(ExchangeRateValue.class)
                 .log();
 
         return Flux.concat(
                 exchangeRateValueMono.map(exchangeRateValue -> {
 
-                    log.info("Requested information was RETURNED successfully!...");
+                    log.info("REQUESTED INFORMATION WAS RETURNED SUCCESSFULLY!...");
 
-                    log.info("Exchange Rate values: {}", exchangeRateValue);
+                    log.info("EXCHANGE RATE VALUES: {}", exchangeRateValue);
 
                     Collection<Mono<ConversionTransaction>> conversionTransactions = new ArrayList<>();
                     for (Map.Entry<String, BigDecimal> pair : exchangeRateValue.getRates().entrySet()) {
@@ -92,12 +89,9 @@ public class ConversionTransactionServiceImpl implements IConversionTransactionS
                         .build();
     }
 
-    private Mono<Throwable> get4xxError(HttpStatus notFound, String s) {
-        return Mono.error(new ResponseStatusException(notFound, s));
-    }
-
-    private Mono<Throwable> get5xxError(HttpStatus serverError, String s) {
-        return Mono.error(new ResponseStatusException(serverError, s));
+    private Mono<Throwable> get4xxError() {
+        return Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
+                "Exchange Rates Service could not find the requested resource! Please, check https://exchangeratesapi.io/"));
     }
 
     private <T> Flux<T> fluxResponseStatusNotFoundException() {

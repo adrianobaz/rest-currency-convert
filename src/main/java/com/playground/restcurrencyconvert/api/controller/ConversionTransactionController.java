@@ -30,11 +30,12 @@ public class ConversionTransactionController {
     @Operation(description = "Search exchange rates and save requested transactions",
             responses = {
                     @ApiResponse(responseCode = "201", description = "Save transactions successfully!"),
-                    @ApiResponse(responseCode = "400", description = "Request has an error(s)!")
+                    @ApiResponse(responseCode = "400", description = "The request violated one of the constraints necessary to successfully execute the request"),
+                    @ApiResponse(responseCode = "404", description = "Exchange Rates Service could not find the requested resource!")
             })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Flux<ConversionTransactionOutput> register(
+    public Flux<ConversionTransactionOutput> create(
             @Valid @RequestBody ConversionTransactionInput conversionTransactionInput) {
         Integer userId = conversionTransactionInput.getUserId();
         String originCurrency = conversionTransactionInput.getOriginCurrency().toUpperCase();
