@@ -61,7 +61,7 @@ class ConversionTransactionServiceImplTest {
     void blockHoundWorks() {
         try {
             FutureTask<?> task = new FutureTask<>(() -> {
-                Thread.sleep(0);
+                Thread.sleep(0); //NOSONAR
                 return "";
             });
             Schedulers.parallel().schedule(task);
