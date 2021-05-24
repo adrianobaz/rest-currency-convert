@@ -10,7 +10,7 @@ XXX
 
 ## How it works:
 ### **1. Docker. First, you need to install docker**
-* Download Docker [Here](https://docs.docker.com/docker-for-windows/install/). Hint: Enable Hyper-V feature on windows and restart;
+* Download Docker [Here](https://docs.docker.com/desktop/);
 * Then open powershell and check:
 ```bash
 docker info
@@ -30,7 +30,7 @@ git clone https://github.com/adrianobaz/rest-currency-convert.git
 ```
 * Build the maven project:
 ```bash
-mvn clean install -DskipTests
+./mvnw clean package -DskipTests
 ```
 * Running the containers:
 

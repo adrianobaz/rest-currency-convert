@@ -2,10 +2,13 @@ version: '3.8'
 services:
   # App
   app:
-    image: 'rest-currency-convert:latest'
+    image: rest-currency-convert:latest
+    container_name: currency-convert-service
     build:
       context: .
-    container_name: app
+      dockerfile: Dockerfile
+    ports:
+      - "8088:8088"
     depends_on:
       - db
 
@@ -13,10 +16,9 @@ services:
   db:
     image: postgres:12
     container_name: postgres-db
-    restart: always
-
     ports:
       - "5432:5432"
+    restart: always
 
     environment:
       POSTGRES_USER: root

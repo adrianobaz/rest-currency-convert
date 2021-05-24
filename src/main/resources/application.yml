@@ -1,6 +1,7 @@
 spring:
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/playground?schema=currency_exchanges
+    #If you choose to run locally without docker, then change 'db' to 'localhost'
+    url: r2dbc:postgresql://db:5432/playground?schema=currency_exchanges
     username: root
     password: root
 
@@ -8,19 +9,18 @@ spring:
     name: rest-currency-convert
 
   flyway:
-    url: jdbc:postgresql://localhost:5432/playground
+    #If you choose to run locally without docker, then change 'db' to 'localhost'
+    url: jdbc:postgresql://db:5432/playground
     user: ${spring.r2dbc.username}
     password: ${spring.r2dbc.password}
     baseline-on-migrate: true
 
 server:
-  port: 8080
+  port: 8088
 
 logging:
   level:
     org.springframework.data.r2dbc: debug
-
-reactor
 
 springdoc:
   version: 1.0
